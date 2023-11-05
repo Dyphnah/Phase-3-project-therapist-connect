@@ -1,5 +1,5 @@
 # CLI
-#Bug- getting duplicte responses- still checking
+# Bug- getting duplicte responses- still checking
 
 from database import *
 
@@ -14,13 +14,21 @@ if __name__ == '__main__':
         print("\n1. View all therapists\n2. Search for a therapist\n3. Review a therapist\n4. Exit")
         choice = input("Enter your choice: ")
 
-        if choice == '1':
+        try:
+            choice = int(choice)
+            if choice < 1 or choice > 4:
+                raise ValueError
+        except ValueError:
+            print("Invalid choice. Please enter a number between 1 and 4.")
+            continue
+
+        if choice == 1:
             therapists = therapist_db.get_all_therapists()
             print("\nAll Therapists:")
             for therapist in therapists:
                 print(therapist)
 
-        elif choice == '2':
+        elif choice == 2:
             filter_option = input(
                 "Choose a filter option (name, location, specialty, reviews): ")
             filter_value = input(
@@ -36,23 +44,26 @@ if __name__ == '__main__':
                 print(
                     f"No therapists found with {filter_option} '{filter_value}'.")
 
-        elif choice == '3':
+        elif choice == 3:
             therapist_id = input(
                 "Enter the ID of the therapist you want to review: ")
-            rating = float(input("Enter your rating (0.0 - 5.0): "))
+
+            try:
+                therapist_id = int(therapist_id)
+            except ValueError:
+                print("Invalid input. Therapist ID should be an integer.")
+                continue
+
+            rating = input("Enter your rating (0.0 - 5.0): ")
+            try:
+                rating = float(rating)
+                if rating < 0.0 or rating > 5.0:
+                    raise ValueError
+            except ValueError:
+                print("Invalid input. Rating should be a float between 0.0 and 5.0.")
+                continue
+
             therapist_db.review_therapist(therapist_id, rating)
 
-        elif choice == '4':
+        elif choice == 4:
             break
-
-        else:
-            print("Invalid choice. Please select a valid option.")
-
-
-
-
-
-
-
-
-
