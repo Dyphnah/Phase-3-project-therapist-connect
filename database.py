@@ -1,7 +1,6 @@
 # Phase 3 Project. Therapist Connect- A Directory with Many_to_many relationship
 
-from sqlalchemy import create_engine
-from sqlalchemy import ForeignKey, Table, Column, Integer, String, Float
+from sqlalchemy import create_engine, ForeignKey, Table, Column, Integer, String, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -18,6 +17,14 @@ therapist_speciality = Table(
     extend_existing=True
 )
 
+therapist_patient = Table(
+    'therapist_patient',
+    Base.metadata,
+    Column('therapist_id', Integer, ForeignKey('therapists.id')),
+    Column('patient_id', Integer, ForeignKey('patients.id')),
+    extend_existing=True
+)
+
 
 class Therapist(Base):
     __tablename__ = 'therapists'
@@ -29,6 +36,8 @@ class Therapist(Base):
     total_ratings = Column(Integer())
     specialities = relationship(
         'Specialty', secondary=therapist_speciality, back_populates='therapists')
+    patients = relationship(
+        'Patient', secondary=therapist_patient, back_populates='therapists')
 
     def __repr__(self):
         return f'Therapist ID: {self.id}, ' + \
@@ -51,6 +60,18 @@ class Specialty(Base):
             f' Name: {self.name})'
 
 
+class Patient(Base):
+    __tablename__ = 'patients'
+
+    id = Column(Integer(), primary_key=True)
+    name = Column(String())
+    therapists = relationship(
+        'Therapist', secondary=therapist_patient, back_populates='patients')
+
+    def __repr__(self):
+        return f'Patient ID: {self.id}, ' + f'Name: {self.name}'
+
+
 class TherapistDatabase:
     def __init__(self, db_name):
         self.engine = create_engine(f'sqlite:///{db_name}', echo=True)
@@ -59,6 +80,10 @@ class TherapistDatabase:
         self.session = self.Session()
 
     def populate_sample_data(self):
+        if self.session.query(Therapist).count() > 0:
+            print("Sample data already exists. Skipping population.")
+            return
+
         specialty1 = Specialty(name='Anxiety')
         specialty2 = Specialty(name='Depression')
         specialty3 = Specialty(name='ADHD')
@@ -98,3 +123,54 @@ class TherapistDatabase:
 
     def __del__(self):
         self.session.close()
+
+
+# from sqlalchemy import create_engine
+# from sqlalchemy import ForeignKey, Table, Column, Integer, String, Float
+# from sqlalchemy.orm import relationship
+# from sqlalchemy.orm import declarative_base
+# from sqlalchemy.orm import sessionmaker
+
+# engine = create_engine('sqlite:///therapist.db')
+
+# Base = declarative_base()
+
+# therapist_speciality = Table(
+#     'therapist_speciality',
+#     Base.metadata,
+#     Column('therapist_id', Integer, ForeignKey('therapists.id')),
+#     Column('specialty_id', Integer, ForeignKey('specialties.id')),
+#     extend_existing=True
+# )
+
+
+# class Therapist(Base):
+#     __tablename__ = 'therapists'
+
+#     id = Column(Integer(), primary_key=True)
+#     name = Column(String())
+#     location = Column(String())
+#     rating = Column(Float())
+#     total_ratings = Column(Integer())
+#     specialities = relationship(
+#         'Specialty', secondary=therapist_speciality, back_populates='therapists')
+
+#     def __repr__(self):
+#         return f'Therapist ID: {self.id}, ' + \
+#             f'Name: {self.name}, ' + \
+#             f'Location: {self.location}, ' + \
+#             f'Rating: {self.rating}, ' + \
+#             f'Total Ratings: {self.total_ratings})'
+
+
+# class Specialty(Base):
+#     __tablename__ = 'specialties'
+
+#     id = Column(Integer(), primary_key=True)
+#     name = Column(String())
+#     therapists = relationship(
+#         "Therapist", secondary=therapist_speciality, back_populates='specialities')
+
+#     def __repr__(self):
+#         return f'Specialty ID: {self.id}, ' + \
+#             f' Name: {self.name})'
