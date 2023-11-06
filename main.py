@@ -1,5 +1,4 @@
 # CLI
-# Bug- getting duplicte responses- still checking
 
 from database import *
 

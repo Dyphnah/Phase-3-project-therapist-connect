@@ -125,6 +125,35 @@ class TherapistDatabase:
         self.session.close()
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # from sqlalchemy import create_engine
 # from sqlalchemy import ForeignKey, Table, Column, Integer, String, Float
 # from sqlalchemy.orm import relationship
